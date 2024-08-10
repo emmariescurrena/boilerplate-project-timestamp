@@ -26,19 +26,28 @@ app.get("/api/hello", function (req, res) {
     res.json({ greeting: 'hello API' });
 });
 
-app.get("/api/:date", function (req, res) {
-    let date = req.params.date;
+app.get("/api/:date?", function (req, res) {
+    console.log(req.params);
     let dateMilliseconds;
-    if (date.includes("-")) {
-        date = new Date(date);
-        dateMilliseconds = date.getTime();
+    if (req.params.date === undefined) {
+        dateMilliseconds = Date.now();
+        const dateString = new Date(dateMilliseconds).toUTCString();
+        res.json({
+            unix: dateMilliseconds,
+            utc: dateString
+        });
+        return;
+    }
+    let date = req.params.date;
+    if (isNaN(date)) {
+        dateMilliseconds = Date.parse(date);
     } else {
         dateMilliseconds = Number(date);
     }
     const dateString = new Date(dateMilliseconds).toUTCString();
-    if (dateString == "Invalid date") {
+    if (dateString == "Invalid Date") {
         res.json({
-            error: "Invalid date"
+            error: "Invalid Date"
         })
     } else {
         res.json({
